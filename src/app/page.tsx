@@ -1,11 +1,11 @@
-// src/app/page.tsx
-
 "use client";
 
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Menu, MenuItem, Button, Typography } from "@mui/material";
 import React from "react";
-import { Menu, MenuItem, Button } from "@mui/material";
 
-export default function PositionedMenu() {
+export default function HomePage() {
+  const { data: session } = useSession();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -21,20 +21,37 @@ export default function PositionedMenu() {
     <div
       style={{
         display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
-        padding: "16px", // Optional: adds spacing from the edge
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         height: "100vh",
       }}
     >
-      <Button onClick={handleClick} variant="contained">
-        Open Menu
-      </Button>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
-      </Menu>
+      {!session ? (
+        <>
+          <Typography variant="h6" gutterBottom>
+            You are not logged in. Please log in using the menu.
+          </Typography>
+          <Button onClick={handleClick} variant="contained">
+            Open Menu
+          </Button>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <MenuItem onClick={() => { handleClose(); signIn("google"); }}>Log In</MenuItem>
+          </Menu>
+        </>
+      ) : (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Welcome, {session.user?.name}!
+          </Typography>
+          <Button onClick={handleClick} variant="contained">
+            Open Menu
+          </Button>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <MenuItem onClick={() => { handleClose(); signOut(); }}>Log Out</MenuItem>
+          </Menu>
+        </>
+      )}
     </div>
   );
 }
