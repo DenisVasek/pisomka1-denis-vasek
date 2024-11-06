@@ -9,9 +9,14 @@ const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  pages: {
+    signIn: "/login", // Specify the custom login page path here
+  },
   callbacks: {
     async session({ session, token }: { session: Session; token: JWT }) {
-      session.user.id = token.sub!;
+      if (session.user) {
+        session.user.id = token.sub!;
+      }
       return session;
     },
   },
